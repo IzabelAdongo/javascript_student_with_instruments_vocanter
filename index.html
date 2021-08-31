@@ -20,6 +20,7 @@
           <div id="student_search"></div>
           
         <h5>Students With instruments</h5>
+        <div id="cocktail"></div>
         <p><ul id="various_students"></ul></p>
         <h5>Dropdown with fetch</h5>
         <div class="form-row align-items-center">
@@ -47,40 +48,42 @@
 });
 
 
-async function displayStudentsWithInstruments(){
-    let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/students';
-    let res = await fetch(url);
-  //   let res = await fetch(url,{
-  //       method:'POST',
-  //       headers:{'Content-Type':"application/json"},
-  //        body: JSON.stringify({
-  //         query: `{
-  //         name
-        
-        
-  //     }`,
-  //   })
-  // });
-    let json_data = await res.json();
-    
-    let html_paragraph = '';
-    json_data.forEach((repo) => {
-      html_paragraph=`<li><a href="javascript:void(0);" onclick="LoadStudentInformation(${repo.id});">${repo.name}</a> has played the ${repo.instrumentId} for ${repo.experience} years</li>`;
-        document.getElementById("various_students").innerHTML += html_paragraph;
- 
-      
-    });
-   
 
+
+async function displayStudentsWithInstruments(){
+  fetch("https://my-json-server.typicode.com/vocanter-llc/music-students/db")
+  .then((response) => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error("NETWORK RESPONSE NOT OK");
+    }
+  })
+  .then(function (data) {   
+    console.log(data); 
+    displayCocktail(data);
+  })
+  .catch((error) => {
+    console.error("FETCH ERROR:", error);
+  });
+  
   }
+  function displayCocktail(data) {
+
+
+for( let i=0; i<data.students.length; i++){
+const cocktailDiv = document.getElementById("various_students");
+const cocktailName = data.students[i].name + ' has played the ' + data.instruments[data.students[i].instrumentId - 1].name + ' for ' + data.students[i].experience + ' years';
+const paragraph = document.createElement("li");
+paragraph.innerHTML = cocktailName;
+cocktailDiv.appendChild(paragraph);
+}
+}
   async function displayAllInstruments(){
     let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/instruments';
     let res = await fetch(url);
     let json_data = await res.json();
-    jsonArray.sort(function(a,b){
-     return a.name > b.name;
-    });
-    
+       
     let select_instrument = document.getElementById('instruments');
     json_data.forEach((repo) => {
       const option=document.createElement('option')
