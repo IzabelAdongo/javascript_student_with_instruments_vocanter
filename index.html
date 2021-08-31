@@ -1,0 +1,261 @@
+<html>
+    <head>
+        <title>Students</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script src="jquery-3.5.1.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <div style="width:800px; margin:auto; margin-top: 100px;">
+          <h4>Vocanter Interview</h4>
+          <div class="input-group">
+            <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search"
+              aria-describedby="search-addon" id="student_name" onkeyup="searchByStudentName()" />
+            <button type="button" class="btn btn-outline-primary" onclick="searchByStudentName()">Search</button>
+            <button type="button" class="btn btn-outline-primary" onclick="Clear()">Clear</button>
+          </div>
+          <div id="student_search"></div>
+          
+        <h5>Students With instruments</h5>
+        <p><ul id="various_students"></ul></p>
+        <h5>Dropdown with fetch</h5>
+        <div class="form-row align-items-center">
+          <div class="col-auto my-1">
+            <label class="mr-sm-2" for="Instruments">Select Instrument</label>
+              <select class="custom-select mr-sm-2" id="instruments">
+                <option>Choose...</option>
+              </select>
+            </div>
+        </div>
+        <div id="players_per_instrument">
+
+        </div>
+          </div>
+
+    </body>
+
+</html>
+<script>
+  document.addEventListener("DOMContentLoaded", function(event) {
+    displayStudentsWithInstruments();
+    displayAllInstruments();
+    getAlldbData();
+    
+});
+
+
+async function displayStudentsWithInstruments(){
+    let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/students';
+    let res = await fetch(url);
+  //   let res = await fetch(url,{
+  //       method:'POST',
+  //       headers:{'Content-Type':"application/json"},
+  //        body: JSON.stringify({
+  //         query: `{
+  //         name
+        
+        
+  //     }`,
+  //   })
+  // });
+    let json_data = await res.json();
+    
+    let html_paragraph = '';
+    json_data.forEach((repo) => {
+      html_paragraph=`<li><a href="javascript:void(0);" onclick="LoadStudentInformation(${repo.id});">${repo.name}</a> has played the ${repo.instrumentId} for ${repo.experience} years</li>`;
+        document.getElementById("various_students").innerHTML += html_paragraph;
+ 
+      
+    });
+   
+
+  }
+  async function displayAllInstruments(){
+    let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/instruments';
+    let res = await fetch(url);
+    let json_data = await res.json();
+    jsonArray.sort(function(a,b){
+     return a.name > b.name;
+    });
+    
+    let select_instrument = document.getElementById('instruments');
+    json_data.forEach((repo) => {
+      const option=document.createElement('option')
+      option.value=`${repo.id}`
+      option.innerText=`${repo.name}`
+      select_instrument.append(option)
+    
+      
+    });
+
+
+   select_instrument.addEventListener('change', e=> {
+     let instrument_id = e.target.value;
+     getStudentPerInstrument(instrument_id);
+
+    })
+  }
+
+  async function getStudentPerInstrument(instrument_id){
+    let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/db';
+    // let res = await fetch(url);
+    let res = await fetch(url,{
+        method:'POST',
+        headers:{'Content-Type':"application/json"},
+         body: JSON.stringify({
+          query: `query getStudentsPerInstrument($id:int){
+              instruments(id:$instrument_id){
+                students{
+                  name
+                }
+              }
+            
+            
+          }`, 
+      variables:{instrument_id:instrument_id}
+
+    })
+  });
+    let json_data = await res.json();
+    console.log(json_data);
+    
+    
+  }
+
+  async function getAlldbData(){
+    let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/db';
+    // let res = await fetch(url);
+    let res = await fetch(url,{
+        method:'POST',
+        headers:{'Content-Type':"application/json"},
+        body: JSON.stringify({
+          query: `
+          query getStudentsPerInstrument($id:int!){
+              instruments(id:"1"){
+                students{
+                  name
+                }
+              }
+            
+            
+          }`
+    })
+  });
+    let json_data = await res.json();
+    console.log(json_data);
+    
+    // let select_instrument = document.getElementById('instruments');
+    // json_data.forEach((repo) => {
+    //   const option=document.createElement('option')
+    //   option.value=`${repo.id}`
+    //   option.innerText=`${repo.name}`
+    //   select_instrument.append(option)
+    
+      
+    // });
+  }
+
+  async function searchByStudentName(){
+    let student_name=document.getElementById('student_name').value;
+    if(student_name==""){
+      document.getElementById("student_search").innerHTML= "No results found";
+
+    }else{
+    let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/students';
+    let res = await fetch(url);
+  //   let res = await fetch(url,{
+  //       method:'POST',
+  //       headers:{'Content-Type':"application/json"},
+  //       body: JSON.stringify({
+  //         query: `
+  //         query getStudentsByName($student_name:String){ 
+  //               students(name:"$student_name"){
+  //                 name
+  //               }
+  //         }`,
+  //         variables:{student_name:student_name}
+  //   })
+  // });
+    let json_data = await res.json();
+    
+      let html_paragraph = '';
+      json_data.forEach((repo) => {
+      html_paragraph=`<p>${repo.name}`;
+      document.getElementById("student_search").innerHTML += html_paragraph;
+ 
+      
+    });
+  }
+    
+  }
+  async function searchByStudentName(){
+    let student_name=document.getElementById('student_name').value;
+    if(student_name==""){
+      document.getElementById("student_search").innerHTML= "No results found";
+
+    }else{
+    let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/students';
+    let res = await fetch(url);
+  //   let res = await fetch(url,{
+  //       method:'POST',
+  //       headers:{'Content-Type':"application/json"},
+  //       body: JSON.stringify({
+  //         query: `
+  //         query getStudentsByName($student_name:String){ 
+  //               students(name:"$student_name"){
+  //                 name
+  //               }
+  //         }`,
+  //         variables:{student_name:student_name}
+  //   })
+  // });
+    let json_data = await res.json();
+    
+      let html_paragraph = '';
+      json_data.forEach((repo) => {
+      html_paragraph=`<p>${repo.name}`;
+      document.getElementById("student_search").innerHTML += html_paragraph;
+ 
+      
+    });
+  }
+    
+  }
+  function Clear(){
+    document.getElementById("student_search").innerHTML = "";
+    document.getElementById("student_name").value = ""
+
+  }
+  async function LoadStudentInformation(id){
+    let page_url="student_information.html";
+    window.location.href = page_url;
+    let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/students';
+                let res = await fetch(url);
+                // let res = await fetch(url,{
+                // method:'POST',
+                // headers:{'Content-Type':"application/json"},
+                // body: JSON.stringify({
+                // query: `query getStudentsById($id:int){
+                // students(id:id){
+                // name
+                // experience
+                // }  
+                // }`, 
+                // variables:{instrument_id:instrument_id}
+
+                // })
+                // });
+                let json_data = await res.json();
+                console.log(json_data);
+                document.getElementById("student_name").innerHTML = `${json_data.name}`;
+                document.getElementById("_name").innerHTML = `${json_data.name}`;
+                document.getElementById("years_of_experience").innerHTML = `${json_data.experience}`;
+            
+    
+  }
+
+</script>
+
