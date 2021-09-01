@@ -98,11 +98,18 @@ async function displayAllInstruments(){
   }
 
   async function getStudentPerInstrument(instrument_id){
-    let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/db';
+    let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/students';
     let res = await fetch(url);
-    
     let json_data = await res.json();
-    console.log(json_data);
+    $.each(json_data, function(key, value){
+      // alert(value.instrumentID);
+      if(value.instrumentId==instrument_id){   
+        document.getElementById("players_per_instrument").innerHTML += "<li>"+value.name+"</li>";
+    
+      }
+
+    });
+    
     
     
   }
@@ -110,22 +117,8 @@ async function displayAllInstruments(){
   async function getAlldbData(){
     let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/db';
     // let res = await fetch(url);
-    let res = await fetch(url,{
-        method:'POST',
-        headers:{'Content-Type':"application/json"},
-        body: JSON.stringify({
-          query: `
-          query getStudentsPerInstrument($id:int!){
-              instruments(id:"1"){
-                students{
-                  name
-                }
-              }
-            
-            
-          }`
-    })
-  });
+    let res = await fetch(url);
+ 
     let json_data = await res.json();
     console.log(json_data);
     
