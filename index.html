@@ -68,18 +68,18 @@ async function displayStudentsWithInstruments(){
   });
   
   }
-  function displayCocktail(data) {
+function displayCocktail(data) {
 
 
 for( let i=0; i<data.students.length; i++){
 const cocktailDiv = document.getElementById("various_students");
-const cocktailName = data.students[i].name + ' has played the ' + data.instruments[data.students[i].instrumentId - 1].name + ' for ' + data.students[i].experience + ' years';
+const cocktailName = '<a href="javascript:void(0); onclick=""">'+data.students[i].name + '</a> has played the ' + data.instruments[data.students[i].instrumentId - 1].name + ' for ' + data.students[i].experience + ' years';
 const paragraph = document.createElement("li");
 paragraph.innerHTML = cocktailName;
 cocktailDiv.appendChild(paragraph);
 }
 }
-  async function displayAllInstruments(){
+async function displayAllInstruments(){
     let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/instruments';
     let res = await fetch(url);
     let json_data = await res.json();
@@ -104,24 +104,8 @@ cocktailDiv.appendChild(paragraph);
 
   async function getStudentPerInstrument(instrument_id){
     let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/db';
-    // let res = await fetch(url);
-    let res = await fetch(url,{
-        method:'POST',
-        headers:{'Content-Type':"application/json"},
-         body: JSON.stringify({
-          query: `query getStudentsPerInstrument($id:int){
-              instruments(id:$instrument_id){
-                students{
-                  name
-                }
-              }
-            
-            
-          }`, 
-      variables:{instrument_id:instrument_id}
-
-    })
-  });
+    let res = await fetch(url);
+    
     let json_data = await res.json();
     console.log(json_data);
     
@@ -162,71 +146,30 @@ cocktailDiv.appendChild(paragraph);
   }
 
   async function searchByStudentName(){
+    
     let student_name=document.getElementById('student_name').value;
-    if(student_name==""){
-      document.getElementById("student_search").innerHTML= "No results found";
-
-    }else{
+    if(student_name!=""){
+    document.getElementById("student_search").innerHTML= "";
+    let reg_expression = new RegExp(student_name, "i");
+ 
     let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/students';
     let res = await fetch(url);
-  //   let res = await fetch(url,{
-  //       method:'POST',
-  //       headers:{'Content-Type':"application/json"},
-  //       body: JSON.stringify({
-  //         query: `
-  //         query getStudentsByName($student_name:String){ 
-  //               students(name:"$student_name"){
-  //                 name
-  //               }
-  //         }`,
-  //         variables:{student_name:student_name}
-  //   })
-  // });
     let json_data = await res.json();
+    $.each(json_data, function(key, value){
+      if(value.name.search(reg_expression)!= -1){
+     
+        document.getElementById("student_search").innerHTML += "<li>"+value.name+"</li>";
     
-      let html_paragraph = '';
-      json_data.forEach((repo) => {
-      html_paragraph=`<p>${repo.name}`;
-      document.getElementById("student_search").innerHTML += html_paragraph;
- 
-      
-    });
-  }
-    
-  }
-  async function searchByStudentName(){
-    let student_name=document.getElementById('student_name').value;
-    if(student_name==""){
-      document.getElementById("student_search").innerHTML= "No results found";
+      }
 
-    }else{
-    let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/students';
-    let res = await fetch(url);
-  //   let res = await fetch(url,{
-  //       method:'POST',
-  //       headers:{'Content-Type':"application/json"},
-  //       body: JSON.stringify({
-  //         query: `
-  //         query getStudentsByName($student_name:String){ 
-  //               students(name:"$student_name"){
-  //                 name
-  //               }
-  //         }`,
-  //         variables:{student_name:student_name}
-  //   })
-  // });
-    let json_data = await res.json();
-    
-      let html_paragraph = '';
-      json_data.forEach((repo) => {
-      html_paragraph=`<p>${repo.name}`;
-      document.getElementById("student_search").innerHTML += html_paragraph;
- 
-      
     });
   }
+
+    
+  
     
   }
+  
   function Clear(){
     document.getElementById("student_search").innerHTML = "";
     document.getElementById("student_name").value = ""
