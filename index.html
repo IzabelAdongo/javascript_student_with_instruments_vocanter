@@ -23,17 +23,25 @@
         <div id="cocktail"></div>
         <p><ul id="various_students"></ul></p>
         <h5>Dropdown with fetch</h5>
-        <div class="form-row align-items-center">
-          <div class="col-auto my-1">
-            <label class="mr-sm-2" for="Instruments">Select Instrument</label>
-              <select class="custom-select mr-sm-2" id="instruments">
-                <option>Choose...</option>
-              </select>
+        <div class="container">
+          <div class="row">
+            <div class="col">
+              <div class="col-auto my-1">
+                <label class="mr-sm-2" for="Instruments">Select Instrument</label>
+                  <select class="custom-select mr-sm-2" id="instruments">
+                    <option>Choose...</option>
+                  </select>
+                </div>
             </div>
-        </div>
-        <div id="players_per_instrument">
+            <div class="col">
+              <label class="mr-sm-2" for="Instruments">Students playing this Instrument</label>    
+              <div id="players_per_instrument">
+                <p>-</p>
 
-        </div>
+              </div>
+            </div>
+          </div>
+       
           </div>
 
     </body>
@@ -43,7 +51,7 @@
   document.addEventListener("DOMContentLoaded", function(event) {
     displayStudentsWithInstruments();
     displayAllInstruments();
-    getAlldbData();
+  
     
 });
 async function displayStudentsWithInstruments(){
@@ -78,7 +86,7 @@ async function displayAllInstruments(){
     let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/instruments';
     let res = await fetch(url);
     let json_data = await res.json();
-       
+          
     let select_instrument = document.getElementById('instruments');
     json_data.forEach((repo) => {
       const option=document.createElement('option')
@@ -99,6 +107,7 @@ async function displayAllInstruments(){
 
   async function getStudentPerInstrument(instrument_id){
     let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/students';
+    document.getElementById("players_per_instrument").innerHTML="";
     let res = await fetch(url);
     let json_data = await res.json();
     $.each(json_data, function(key, value){
@@ -113,23 +122,11 @@ async function displayAllInstruments(){
     
     
   }
-
-  async function getAlldbData(){
-    let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/db';
-    // let res = await fetch(url);
-    let res = await fetch(url);
- 
-    let json_data = await res.json();
-    console.log(json_data);
-    
-    
-  }
-
   async function searchByStudentName(){
     
     let student_name=document.getElementById('student_name').value;
-    if(student_name!=""){
     document.getElementById("student_search").innerHTML= "";
+    if(student_name!=""){
     let reg_expression = new RegExp(student_name, "i");
  
     let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/students';
@@ -163,11 +160,9 @@ async function displayAllInstruments(){
         load_instrument_by_id(value.instrumentId, value.name, value.experience);   
         
       }
-      
   
     });
-                        
-    
+                       
   }
   async function load_instrument_by_id(instrumentID, name, experience){
     let page_url="student_information.html";
