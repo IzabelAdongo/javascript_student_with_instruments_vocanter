@@ -18,18 +18,36 @@
     <tbody>
       <tr>
         <td>Name</td>
-        <td id="student_name"></td>
+        <td ><p id="student_name"></p></td>
       </tr>
       <tr>
         <td>Instrument</td>
-        <td>@mdo</td>
+        <td><p id="instrument"></p></td>
       </tr>
       <tr>
         <td>Years of Experience</td>
-        <td id="years_of_experience"></td>
+        <td><p id="years_of_experience"></p></td>
       </tr>
       
     </tbody>
   </table>
 </body>
 </html>
+<script>
+  document.addEventListener("DOMContentLoaded", function(event) {
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const student_name = urlParams.get('student_name');
+const experience= urlParams.get('experience');
+const instrument= urlParams.get('instrument');
+document.getElementById("student_name").innerHTML = student_name;
+document.getElementById("years_of_experience").innerHTML = experience;
+document.getElementById("instrument").innerHTML = instrument;
+ 
+    
+});
+
+
+                   
+  
+</script>

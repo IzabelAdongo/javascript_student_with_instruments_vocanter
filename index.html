@@ -13,9 +13,9 @@
           <h4>Vocanter Interview</h4>
           <div class="input-group">
             <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search"
-              aria-describedby="search-addon" id="student_name" onkeyup="searchByStudentName()" />
-            <button type="button" class="btn btn-outline-primary" onclick="searchByStudentName()">Search</button>
-            <button type="button" class="btn btn-outline-primary" onclick="Clear()">Clear</button>
+              aria-describedby="search-addon" id="student_name" onkeyup="searchByStudentName();" />
+            <button type="button" class="btn btn-outline-primary" onclick="searchByStudentName();">Search</button>
+            <button type="button" class="btn btn-outline-primary" onclick="Clear();">Clear</button>
           </div>
           <div id="student_search"></div>
           
@@ -46,10 +46,6 @@
     getAlldbData();
     
 });
-
-
-
-
 async function displayStudentsWithInstruments(){
   fetch("https://my-json-server.typicode.com/vocanter-llc/music-students/db")
   .then((response) => {
@@ -70,14 +66,13 @@ async function displayStudentsWithInstruments(){
   }
 function displayCocktail(data) {
 
-
-for( let i=0; i<data.students.length; i++){
-const cocktailDiv = document.getElementById("various_students");
-const cocktailName = '<a href="javascript:void(0); onclick=""">'+data.students[i].name + '</a> has played the ' + data.instruments[data.students[i].instrumentId - 1].name + ' for ' + data.students[i].experience + ' years';
-const paragraph = document.createElement("li");
-paragraph.innerHTML = cocktailName;
-cocktailDiv.appendChild(paragraph);
-}
+        for( let i=0; i<data.students.length; i++){
+        const cocktailDiv = document.getElementById("various_students");
+        const cocktailName = '<a href="javascript:void(0);" onclick="LoadStudentInformation('+data.students[i].id +');">'+data.students[i].name + '</a> has played the ' + data.instruments[data.students[i].instrumentId - 1].name + ' for ' + data.students[i].experience + ' years';
+        const paragraph = document.createElement("li");
+        paragraph.innerHTML = cocktailName;
+        cocktailDiv.appendChild(paragraph);
+        }
 }
 async function displayAllInstruments(){
     let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/instruments';
@@ -134,15 +129,7 @@ async function displayAllInstruments(){
     let json_data = await res.json();
     console.log(json_data);
     
-    // let select_instrument = document.getElementById('instruments');
-    // json_data.forEach((repo) => {
-    //   const option=document.createElement('option')
-    //   option.value=`${repo.id}`
-    //   option.innerText=`${repo.name}`
-    //   select_instrument.append(option)
     
-      
-    // });
   }
 
   async function searchByStudentName(){
@@ -166,8 +153,6 @@ async function displayAllInstruments(){
   }
 
     
-  
-    
   }
   
   function Clear(){
@@ -176,32 +161,39 @@ async function displayAllInstruments(){
 
   }
   async function LoadStudentInformation(id){
-    let page_url="student_information.html";
-    window.location.href = page_url;
+    
     let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/students';
-                let res = await fetch(url);
-                // let res = await fetch(url,{
-                // method:'POST',
-                // headers:{'Content-Type':"application/json"},
-                // body: JSON.stringify({
-                // query: `query getStudentsById($id:int){
-                // students(id:id){
-                // name
-                // experience
-                // }  
-                // }`, 
-                // variables:{instrument_id:instrument_id}
-
-                // })
-                // });
-                let json_data = await res.json();
-                console.log(json_data);
-                document.getElementById("student_name").innerHTML = `${json_data.name}`;
-                document.getElementById("_name").innerHTML = `${json_data.name}`;
-                document.getElementById("years_of_experience").innerHTML = `${json_data.experience}`;
-            
+    let res = await fetch(url);
+    let json_data = await res.json();
+    $.each(json_data, function(key, value){
+      if(value.id==id){
+        load_instrument_by_id(value.instrumentId, value.name, value.experience);   
+        
+      }
+      
+  
+    });
+                        
     
   }
+  async function load_instrument_by_id(instrumentID, name, experience){
+    let page_url="student_information.html";
+    let url_two = 'https://my-json-server.typicode.com/vocanter-llc/music-students/instruments';
+    let resly = await fetch(url_two);
+    let json_datta = await resly.json();
+    $.each(json_datta, function(index, paired_val){
+    if(paired_val.id==instrumentID){
+           window.location.href = page_url+"?student_name="+name+"&experience="+experience+"&instrument="+paired_val.name;
+    }
+  });
+
+  }
+  
+
+
+
+
+
 
 </script>
 
