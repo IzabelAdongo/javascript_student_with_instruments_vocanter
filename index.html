@@ -11,39 +11,37 @@
     <body>
         <div style="width:800px; margin:auto; margin-top: 100px;">
           <h4>Vocanter Interview</h4>
-          <div class="input-group">
-            <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search"
-              aria-describedby="search-addon" id="student_name" onkeyup="searchByStudentName();" />
-            <button type="button" class="btn btn-outline-primary" onclick="searchByStudentName();">Search</button>
-            <button type="button" class="btn btn-outline-primary" onclick="Clear();">Clear</button>
-          </div>
-          <div id="student_search"></div>
-          
-        <h5>Students With instruments</h5>
-        <div id="cocktail"></div>
-        <p><ul id="various_students"></ul></p>
-        <h5>Dropdown with fetch</h5>
-        <div class="container">
-          <div class="row">
-            <div class="col">
-              <div class="col-auto my-1">
-                <label class="mr-sm-2" for="Instruments">Select Instrument</label>
-                  <select class="custom-select mr-sm-2" id="instruments">
-                    <option>Choose...</option>
-                  </select>
+          <div class="container">
+            <div class="row">
+              <div class="col">
+                <div class="col-auto my-1">
+                  <label class="mr-sm-2" for="Instruments">Select Instrument</label>
+                    <select class="custom-select mr-sm-2" id="instruments">
+                      <option>Choose...</option>
+                    </select>
+                  </div>
+              </div>
+              <div class="col">
+                <label>&nbsp;</label>
+                <div class="input-group mb-3">
+                  <input type="text" class="form-control" id="student_name" onkeyup="searchByStudentName();" placeholder="Search here">
+                  <div class="input-group-append">
+                    <span class="input-group-text" onclick="searchByStudentName();">Search</span>
+                  </div>
+                  <div class="input-group-append">
+                    <span class="input-group-text" onclick="Clear();">Clear</span>
+                  </div>
                 </div>
-            </div>
-            <div class="col">
-              <label class="mr-sm-2" for="Instruments">Students playing this Instrument</label>    
-              <div id="players_per_instrument">
-                <p>-</p>
-
+              
+                 
+                </div>
               </div>
             </div>
-          </div>
-       
-          </div>
-
+                         
+        <h5>Students With instruments</h5>
+        
+        <p><ul id="various_students"></ul></p>
+      
     </body>
 
 </html>
@@ -64,23 +62,22 @@ async function displayStudentsWithInstruments(){
     }
   })
   .then(function (data) {   
-    console.log(data); 
-    displayCocktail(data);
+    displayStudentInstrumentData(data);
   })
   .catch((error) => {
     console.error("FETCH ERROR:", error);
   });
   
   }
-function displayCocktail(data) {
+function displayStudentInstrumentData(data) {
 
         for( let i=0; i<data.students.length; i++){
-        const cocktailDiv = document.getElementById("various_students");
-        const cocktailName = '<a href="javascript:void(0);" onclick="LoadStudentInformation('+data.students[i].id +');">'+data.students[i].name + '</a> has played the ' + data.instruments[data.students[i].instrumentId - 1].name + ' for ' + data.students[i].experience + ' years';
+        const studentlDiv = document.getElementById("various_students");
+        const student_name_and_instrument = '<a href="javascript:void(0);" onclick="LoadStudentInformation('+data.students[i].id +');">'+data.students[i].name + '</a> has played the ' + data.instruments[data.students[i].instrumentId - 1].name + ' for ' + data.students[i].experience + ' years';
         const paragraph = document.createElement("li");
-        paragraph.innerHTML = cocktailName;
-        cocktailDiv.appendChild(paragraph);
-        }
+        paragraph.innerHTML = student_name_and_instrument;
+        studentlDiv.appendChild(paragraph);
+     }
 }
 async function displayAllInstruments(){
     let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/instruments';
@@ -106,48 +103,54 @@ async function displayAllInstruments(){
   }
 
   async function getStudentPerInstrument(instrument_id){
-    let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/students';
-    document.getElementById("players_per_instrument").innerHTML="";
+    let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/db';
+    document.getElementById("various_students").innerHTML="";
     let res = await fetch(url);
-    let json_data = await res.json();
-    $.each(json_data, function(key, value){
-      // alert(value.instrumentID);
-      if(value.instrumentId==instrument_id){   
-        document.getElementById("players_per_instrument").innerHTML += "<li>"+value.name+"</li>";
-    
-      }
+    let data = await res.json();
 
+    $.each(data.students, function(key, value){
+    if(value.instrumentId==instrument_id){  
+   
+        const studentlDiv = document.getElementById("various_students");
+        const student_name_and_instrument = '<a href="javascript:void(0);" onclick="LoadStudentInformation('+value.id +');">'+value.name + '</a> has played the ' + data.instruments[value.instrumentId - 1].name + ' for ' + value.experience + ' years';
+        const paragraph = document.createElement("li");
+        paragraph.innerHTML = student_name_and_instrument;
+        studentlDiv.appendChild(paragraph);
+     
+    }
     });
-    
-    
-    
+      
   }
   async function searchByStudentName(){
     
     let student_name=document.getElementById('student_name').value;
-    document.getElementById("student_search").innerHTML= "";
+    document.getElementById("various_students").innerHTML= "";
     if(student_name!=""){
     let reg_expression = new RegExp(student_name, "i");
  
-    let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/students';
+    let url = 'https://my-json-server.typicode.com/vocanter-llc/music-students/db';
     let res = await fetch(url);
-    let json_data = await res.json();
-    $.each(json_data, function(key, value){
+    let data = await res.json();
+    $.each(data.students, function(key, value){
       if(value.name.search(reg_expression)!= -1){
-     
-        document.getElementById("student_search").innerHTML += "<li>"+value.name+"</li>";
-    
+
+        const studentlDiv = document.getElementById("various_students");
+        const student_name_and_instrument = '<a href="javascript:void(0);" onclick="LoadStudentInformation('+value.id +');">'+value.name + '</a> has played the ' + data.instruments[value.instrumentId - 1].name + ' for ' + value.experience + ' years';
+        const paragraph = document.createElement("li");
+        paragraph.innerHTML = student_name_and_instrument;
+        studentlDiv.appendChild(paragraph);
       }
 
     });
+  }else{
+    displayStudentsWithInstruments();
   }
 
     
   }
   
   function Clear(){
-    document.getElementById("student_search").innerHTML = "";
-    document.getElementById("student_name").value = ""
+      document.getElementById("student_name").value = ""
 
   }
   async function LoadStudentInformation(id){
